@@ -15,10 +15,10 @@
 | Phase 8 | AI Analysis | ✅ Completado | 6 ✅ |
 | Phase 9 | Human Review | ✅ Completado | 4 ✅ |
 | Phase 10 | Audit Trail | ✅ Completado | 6 ✅ |
-| Phase 11 | Frontend UI | 🔲 Pendiente | — |
-| Phase 12 | Testing + Demo + Polish | 🔲 Pendiente | — |
+| Phase 11 | Frontend UI | ✅ Completado | — |
+| Phase 12 | Testing + Demo + Polish | ✅ Completado | 9 ✅ |
 
-**Total tests: 64 pasando ✅**
+**Total tests: 73 pasando ✅**
 
 ---
 
@@ -118,6 +118,27 @@
 - RolesGuard en endpoint admin (403 para REVIEWER)
 - **6 tests unitarios**
 
+### Phase 11 — Frontend UI ✅
+- API Client con auto-refresh JWT y typed methods
+- AuthProvider context (login/logout/me)
+- Login page profesional con branding
+- Dashboard con drag & drop PDF upload
+- Paper report: signals, evidence viewer, claims, priority badge
+- Processing states animados
+- Human Review form (APPROVE/REJECT/NEEDS_MORE_REVIEW + reason)
+- Dashboard layout con navegación por rol
+- Protección de rutas client-side
+- **Build exitoso: 9 rutas**
+
+### Phase 12 — Demo Data + Tests Finales ✅
+- DemoCacheService: 3 papers pre-calculados para demo confiable
+  - Case A: paper normal (VERIFIED, LOW priority)
+  - Case B: paper retractado (ALERT, CRITICAL priority)
+  - Case C: metadata inconsistency (MISMATCH, HIGH priority)
+- VerificationService usa cache automáticamente para DOIs conocidos
+- Cache identificable internamente (cachedAt timestamp)
+- **9 tests adicionales para demo cache**
+
 ---
 
 ## Commits Sugeridos
@@ -130,13 +151,18 @@
 6. `feat(verification): implementar OpenAlex y PubMed providers`
 7. `feat(ai): implementar AI Analysis con validación Zod y retry`
 8. `feat(reviews+audit): implementar Human Review y Audit Trail`
+9. `feat(frontend): implementar UI completa (login, upload, report, evidence, review)`
+10. `feat(demo): agregar demo cache y tests finales`
 
 ---
 
 ## Próximos Pasos
 
-1. **Phase 11** — Frontend UI (login, upload, processing, report, evidence, review)
-2. **Phase 12** — Testing + Demo data + Polish
+El MVP está completo. Pasos opcionales:
+- Ejecutar `prisma migrate dev` cuando PostgreSQL esté activo
+- Ejecutar `prisma db seed` para crear usuarios demo
+- Configurar `AI_API_KEY` para análisis con OpenAI
+- Correr el demo end-to-end con los 3 papers de prueba
 
 ---
 

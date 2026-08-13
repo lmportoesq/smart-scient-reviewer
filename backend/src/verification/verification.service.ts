@@ -8,6 +8,7 @@ import {
 import { CrossrefProvider } from './providers/crossref.provider';
 import { OpenAlexProvider } from './providers/openalex.provider';
 import { PubMedProvider } from './providers/pubmed.provider';
+import { DemoCacheService } from './demo-cache.service';
 
 @Injectable()
 export class VerificationService {
@@ -19,6 +20,7 @@ export class VerificationService {
     private crossrefProvider: CrossrefProvider,
     private openAlexProvider: OpenAlexProvider,
     private pubMedProvider: PubMedProvider,
+    private demoCache: DemoCacheService,
   ) {
     this.providers = [
       this.crossrefProvider,
@@ -29,12 +31,26 @@ export class VerificationService {
 
   /**
    * Run all available verification providers for a paper.
+   * Uses demo cache as fallback if available (spec §63).
    * Provider failures are isolated — one failing doesn't stop others (spec §57).
    */
   async verifyPaper(
     paperId: string,
     input: PaperVerificationInput,
   ): Promise<VerificationResult[]> {
+    // Check demo cache first (for hackathon reliability)
+    if (input.doi && this.demoCache.hasCachedResults(input.doi)) {
+      const cachedResults = this.demoCache.getCachedResults(input.doi);
+      if (cachedResults) {
+        this.logger.log(`Using demo cache for paper ${paperId} (DOI: ${input.doi})`);
+        for (const result of cachedResults) {
+          await this.persistVerification(paperId, result, true);
+        }
+        return cachedResults;
+      }
+    }
+
+    // Live verification
     const results: VerificationResult[] = [];
 
     for (const provider of this.providers) {
@@ -42,16 +58,13 @@ export class VerificationService {
         this.logger.log(`Running ${provider.name} verification for paper ${paperId}`);
         const result = await provider.verify(input);
         results.push(result);
-
-        // Persist verification result
-        await this.persistVerification(paperId, result);
+        await this.persistVerification(paperId, result, false);
       } catch (error) {
         this.logger.error(
           `Provider ${provider.name} failed for paper ${paperId}`,
           error,
         );
 
-        // Create error result — do NOT stop other providers
         const errorResult: VerificationResult = {
           provider: provider.name,
           status: 'ERROR' as any,
@@ -59,16 +72,13 @@ export class VerificationService {
           signals: [],
         };
         results.push(errorResult);
-        await this.persistVerification(paperId, errorResult);
+        await this.persistVerification(paperId, errorResult, false);
       }
     }
 
     return results;
   }
 
-  /**
-   * Add a provider dynamically (for future extensibility).
-   */
   registerProvider(provider: VerificationProvider) {
     this.providers.push(provider);
   }
@@ -76,6 +86,7 @@ export class VerificationService {
   private async persistVerification(
     paperId: string,
     result: VerificationResult,
+    cached: boolean,
   ) {
     for (const signal of result.signals) {
       await this.prisma.verification.create({
@@ -86,11 +97,11 @@ export class VerificationService {
           status: result.status,
           severity: signal.severity as any,
           metadata: result.metadata as any,
+          cachedAt: cached ? new Date() : undefined,
         },
       });
     }
 
-    // If no signals, still persist the verification attempt
     if (result.signals.length === 0) {
       await this.prisma.verification.create({
         data: {
@@ -100,6 +111,7 @@ export class VerificationService {
           status: result.status,
           severity: null,
           metadata: result.metadata as any,
+          cachedAt: cached ? new Date() : undefined,
         },
       });
     }

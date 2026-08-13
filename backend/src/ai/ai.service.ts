@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { PrismaService } from '../prisma/prisma.service';
 import { AIProvider, AIAnalysisInput, AIAnalysisRawResult } from './providers/ai-provider.interface';
 import { OpenAIProvider } from './providers/openai.provider';
-import { aiAnalysisOutputSchema } from '@scientificguard/shared';
+import { aiAnalysisOutputSchema } from './validators/ai-output.schema';
 
 @Injectable()
 export class AiService {

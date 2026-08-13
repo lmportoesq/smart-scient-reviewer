@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { VerificationResult } from './providers/verification-provider.interface';
-import { VerificationStatus, SignalSeverity } from '@scientificguard/shared';
+import { VerificationStatus, SignalSeverity } from '../common/enums';
 
 /**
  * Demo cache for hackathon presentation (spec §63).

@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
-import { AuditAction } from '@scientificguard/shared';
+import { AuditAction } from '../common/enums';
 
 export interface CreateReviewInput {
   decision: 'APPROVE' | 'REJECT' | 'NEEDS_MORE_REVIEW';

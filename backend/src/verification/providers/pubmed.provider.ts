@@ -6,7 +6,7 @@ import {
   VerificationResult,
   VerificationSignal,
 } from './verification-provider.interface';
-import { VerificationStatus, SignalSeverity } from '@scientificguard/shared';
+import { VerificationStatus, SignalSeverity } from '../../common/enums';
 
 // Zod schemas for PubMed/NCBI API responses
 const esearchResultSchema = z.object({

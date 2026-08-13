@@ -1,4 +1,4 @@
-import { VerificationStatus, SignalSeverity } from '@scientificguard/shared';
+import { VerificationStatus, SignalSeverity } from '../../common/enums';
 
 export interface PaperVerificationInput {
   doi?: string;

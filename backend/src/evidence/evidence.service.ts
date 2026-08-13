@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { VerificationResult, VerificationSignal } from '../verification/providers/verification-provider.interface';
-import { SignalSeverity } from '@scientificguard/shared';
+import { SignalSeverity } from '../common/enums';
 
 @Injectable()
 export class EvidenceService {

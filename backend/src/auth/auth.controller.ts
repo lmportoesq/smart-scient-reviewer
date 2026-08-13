@@ -15,7 +15,7 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { AuditService } from '../audit/audit.service';
-import { AuditAction } from '@scientificguard/shared';
+import { AuditAction } from '../common/enums';
 
 @Controller('auth')
 export class AuthController {

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { ReviewPriority, SignalSeverity } from '@scientificguard/shared';
+import { ReviewPriority, SignalSeverity } from '../common/enums';
 
 /**
  * Deterministic Review Priority calculation.

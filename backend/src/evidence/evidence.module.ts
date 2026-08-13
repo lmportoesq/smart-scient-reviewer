@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
+import { EvidenceService } from './evidence.service';
+import { ReviewPriorityService } from './review-priority.service';
 
 @Module({
-  // Implementation in Phase 6
+  providers: [EvidenceService, ReviewPriorityService],
+  exports: [EvidenceService, ReviewPriorityService],
 })
 export class EvidenceModule {}

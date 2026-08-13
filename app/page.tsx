@@ -32,7 +32,7 @@ export default function Home() {
         {/* Hero */}
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-            ScientificGuard AI
+            Smart Scient Reviewer
           </h1>
           <p className="text-lg text-slate-600 dark:text-slate-400 italic">
             Evidence before decision.

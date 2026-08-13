@@ -1,6 +1,10 @@
 import { Module } from '@nestjs/common';
+import { ReviewsController } from './reviews.controller';
+import { ReviewsService } from './reviews.service';
 
 @Module({
-  // Implementation in Phase 9
+  controllers: [ReviewsController],
+  providers: [ReviewsService],
+  exports: [ReviewsService],
 })
 export class ReviewsModule {}

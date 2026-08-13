@@ -12,13 +12,13 @@
 | Phase 5 | Crossref Provider | ✅ Completado | 10 ✅ |
 | Phase 6 | Evidence Engine + Review Priority | ✅ Completado | 8 ✅ |
 | Phase 7 | OpenAlex + PubMed | ✅ Completado | 13 ✅ |
-| Phase 8 | AI Analysis | 🔲 Pendiente | — |
-| Phase 9 | Human Review | 🔲 Pendiente | — |
-| Phase 10 | Audit Trail | 🔲 Pendiente | — |
+| Phase 8 | AI Analysis | ✅ Completado | 6 ✅ |
+| Phase 9 | Human Review | ✅ Completado | 4 ✅ |
+| Phase 10 | Audit Trail | ✅ Completado | 6 ✅ |
 | Phase 11 | Frontend UI | 🔲 Pendiente | — |
 | Phase 12 | Testing + Demo + Polish | 🔲 Pendiente | — |
 
-**Total tests: 48 pasando ✅**
+**Total tests: 64 pasando ✅**
 
 ---
 
@@ -90,6 +90,34 @@
 - VerificationService actualizado con los 3 proveedores
 - **6 tests OpenAlex + 7 tests PubMed**
 
+### Phase 8 — AI Analysis ✅
+- OpenAIProvider: structured output con JSON mode, system prompt restrictivo
+- AiService: orquesta AI con validación Zod obligatoria
+- Retry automático (1 vez) cuando la validación falla
+- AI_ANALYSIS_ERROR cuando la respuesta es inválida (nunca inventa datos)
+- Claims persistidos en BD con confidence, supportLevel, page
+- Prohibiciones spec §26 enforced: APPROVED/REJECTED/VALID/INVALID rechazados por Zod
+- Integración con PapersService para pipeline completo
+- **6 tests unitarios (valid response, invalid response, retry, prohibited values)**
+
+### Phase 9 — Human Review ✅
+- ReviewsService: crear decisión con reason obligatoria (min 10 chars)
+- ReviewsController: POST /api/papers/:id/review (JWT guard)
+- ReviewerId viene de la sesión autenticada, NUNCA del frontend (spec §44)
+- CreateReviewDto con class-validator (decision enum + reason min length)
+- Audit log automático en cada review creada
+- **4 tests unitarios**
+
+### Phase 10 — Audit Trail ✅
+- AuditService (global): log append-only, sanitización de metadata sensible
+- AuditController: GET /api/papers/:id/audit + GET /api/admin/audit (admin only)
+- Audit en login, logout, login_failed, review_created
+- Sanitización: passwords, tokens, API keys → [REDACTED]
+- Nunca crash la app si audit falla
+- UserAgent truncado a 500 chars
+- RolesGuard en endpoint admin (403 para REVIEWER)
+- **6 tests unitarios**
+
 ---
 
 ## Commits Sugeridos
@@ -100,16 +128,15 @@
 4. `feat(verification): implementar CrossrefProvider con detección de retracciones`
 5. `feat(evidence): implementar Evidence Engine y cálculo determinístico de Review Priority`
 6. `feat(verification): implementar OpenAlex y PubMed providers`
+7. `feat(ai): implementar AI Analysis con validación Zod y retry`
+8. `feat(reviews+audit): implementar Human Review y Audit Trail`
 
 ---
 
 ## Próximos Pasos
 
-1. **Phase 8** — AI Analysis (claims, methodology, Zod validation)
-2. **Phase 9** — Human Review (decisiones, ownership)
-3. **Phase 10** — Audit Trail (append-only)
-4. **Phase 11** — Frontend UI
-5. **Phase 12** — Testing + Demo data + Polish
+1. **Phase 11** — Frontend UI (login, upload, processing, report, evidence, review)
+2. **Phase 12** — Testing + Demo data + Polish
 
 ---
 

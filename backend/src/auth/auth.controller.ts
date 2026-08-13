@@ -14,29 +14,68 @@ import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { AuditService } from '../audit/audit.service';
+import { AuditAction } from '@scientificguard/shared';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private auditService: AuditService,
+  ) {}
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 attempts per minute
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   async login(
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: Response,
+    @Req() req: Request,
   ) {
-    const { user, tokens } = await this.authService.login(dto);
+    try {
+      const { user, tokens } = await this.authService.login(dto);
+      this.setAuthCookies(res, tokens.accessToken, tokens.refreshToken);
 
-    this.setAuthCookies(res, tokens.accessToken, tokens.refreshToken);
+      // Audit successful login
+      await this.auditService.log({
+        userId: user.id,
+        action: AuditAction.LOGIN,
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+      });
 
-    return { user, message: 'Login successful' };
+      return { user, message: 'Login successful' };
+    } catch (error) {
+      // Audit failed login attempt
+      await this.auditService.log({
+        action: AuditAction.LOGIN_FAILED,
+        metadata: { email: dto.email },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+      });
+      throw error;
+    }
   }
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  async logout(@Res({ passthrough: true }) res: Response) {
+  @UseGuards(JwtAuthGuard)
+  async logout(
+    @Res({ passthrough: true }) res: Response,
+    @Req() req: Request,
+  ) {
+    const user = (req as any).user;
+
     this.clearAuthCookies(res);
+
+    // Audit logout
+    await this.auditService.log({
+      userId: user?.id,
+      action: AuditAction.LOGOUT,
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+    });
+
     return { message: 'Logout successful' };
   }
 
@@ -76,7 +115,7 @@ export class AuthController {
       httpOnly: true,
       secure: isProduction,
       sameSite: 'strict',
-      maxAge: 15 * 60 * 1000, // 15 minutes
+      maxAge: 15 * 60 * 1000,
       path: '/',
     });
 
@@ -84,7 +123,7 @@ export class AuthController {
       httpOnly: true,
       secure: isProduction,
       sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000,
       path: '/api/auth/refresh',
     });
   }

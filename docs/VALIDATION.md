@@ -1,4 +1,4 @@
-# ScientificGuard AI — Estrategia de Validación
+# Smart Scient Reviewer — Estrategia de Validación
 
 ## Principio
 

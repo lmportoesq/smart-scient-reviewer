@@ -1,5 +1,5 @@
 /**
- * Typed API client for ScientificGuard backend.
+ * Typed API client for Smart Scient Reviewer backend.
  * All requests include credentials (cookies) for JWT auth.
  */
 

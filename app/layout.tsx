@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'ScientificGuard AI',
+  title: 'Smart Scient Reviewer',
   description: 'AI-assisted scientific paper review with verifiable evidence and human-controlled decisions.',
 };
 

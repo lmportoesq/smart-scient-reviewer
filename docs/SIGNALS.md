@@ -1,4 +1,4 @@
-# ScientificGuard AI — Señales de Verificación
+# Smart Scient Reviewer — Señales de Verificación
 
 ## Resumen de Señales
 

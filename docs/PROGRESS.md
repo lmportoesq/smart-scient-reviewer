@@ -1,4 +1,4 @@
-# ScientificGuard AI — Progreso de Implementación
+# Smart Scient Reviewer — Progreso de Implementación
 
 ## Estado General
 
@@ -143,7 +143,7 @@
 
 ## Commits Sugeridos
 
-1. `feat(infra): inicializar arquitectura del proyecto ScientificGuard`
+1. `feat(infra): inicializar arquitectura del proyecto Smart Scient Reviewer`
 2. `feat(auth): implementar autenticación JWT con HttpOnly cookies`
 3. `feat(documents): implementar upload PDF y extracción de metadata`
 4. `feat(verification): implementar CrossrefProvider con detección de retracciones`

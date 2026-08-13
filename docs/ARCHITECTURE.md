@@ -1,8 +1,8 @@
-# ScientificGuard AI — Arquitectura del Proyecto
+# Smart Scient Reviewer — Arquitectura del Proyecto
 
 ## Visión General
 
-ScientificGuard AI es una plataforma de revisión científica asistida por IA. El sistema ayuda a revisores humanos a evaluar papers científicos más rápido proporcionando verificación bibliográfica, detección de retracciones, análisis de claims y una prioridad de revisión calculada determinísticamente.
+Smart Scient Reviewer es una plataforma de revisión científica asistida por IA. El sistema ayuda a revisores humanos a evaluar papers científicos más rápido proporcionando verificación bibliográfica, detección de retracciones, análisis de claims y una prioridad de revisión calculada determinísticamente.
 
 **Principio core:** AI sugiere. La evidencia respalda. Los humanos deciden.
 

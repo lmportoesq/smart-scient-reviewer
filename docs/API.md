@@ -1,4 +1,4 @@
-# ScientificGuard AI — API Reference
+# Smart Scient Reviewer — API Reference
 
 ## Base URL
 

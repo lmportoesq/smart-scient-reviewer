@@ -62,7 +62,7 @@ export class OpenAIProvider implements AIProvider {
   }
 
   private buildSystemPrompt(): string {
-    return `You are a scientific paper analysis assistant for ScientificGuard AI.
+    return `You are a scientific paper analysis assistant for Smart Scient Reviewer.
 
 Your role is to analyze scientific papers and extract structured information.
 

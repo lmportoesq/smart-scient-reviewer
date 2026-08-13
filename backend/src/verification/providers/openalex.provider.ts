@@ -151,7 +151,7 @@ export class OpenAlexProvider implements VerificationProvider {
 
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'ScientificGuard/1.0 (mailto:dev@scientificguard.local)',
+        'User-Agent': 'SmartScientReviewer/1.0 (mailto:dev@scientificguard.local)',
       },
     });
 

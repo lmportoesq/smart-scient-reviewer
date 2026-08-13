@@ -33,7 +33,7 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3001;
   await app.listen(port);
-  console.log(`ScientificGuard API running on port ${port}`);
+  console.log(`Smart Scient Reviewer API running on port ${port}`);
 }
 
 bootstrap();

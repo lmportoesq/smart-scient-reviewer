@@ -3,6 +3,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { VerificationService } from '../verification/verification.service';
 import { EvidenceService } from '../evidence/evidence.service';
 import { ReviewPriorityService } from '../evidence/review-priority.service';
+import { AiService } from '../ai/ai.service';
+import { AIAnalysisInput } from '../ai/providers/ai-provider.interface';
 
 @Injectable()
 export class PapersService {
@@ -13,6 +15,7 @@ export class PapersService {
     private verificationService: VerificationService,
     private evidenceService: EvidenceService,
     private reviewPriorityService: ReviewPriorityService,
+    private aiService: AiService,
   ) {}
 
   async findById(id: string) {
@@ -76,6 +79,56 @@ export class PapersService {
       // Step 3: Calculate Review Priority (deterministic)
       const reviewPriority = await this.reviewPriorityService.calculateAndPersist(paperId);
 
+      // Step 4: AI Analysis (if API key configured)
+      let aiResult = null;
+      if (process.env.AI_API_KEY) {
+        const document = paper.documents[0];
+        const extractedText = document?.extractedText as any;
+        const extractedMeta = document?.extractedMeta as any;
+
+        const fullText = Array.isArray(extractedText)
+          ? extractedText.map((p: any) => p.text).join('\n\n')
+          : '';
+
+        const aiInput: AIAnalysisInput = {
+          text: fullText,
+          metadata: {
+            title: paper.title || undefined,
+            doi: paper.doi || undefined,
+            pmid: paper.pmid || undefined,
+            journal: paper.journal || undefined,
+            year: paper.publicationYear || undefined,
+            authors: (paper.authors as string[]) || undefined,
+          },
+          verificationResults: verificationResults.map((r) => ({
+            provider: r.provider,
+            status: r.status,
+            signals: r.signals.map((s) => ({
+              type: s.type,
+              severity: s.severity,
+              title: s.title,
+            })),
+          })),
+          references: (extractedMeta?.references || []).map((ref: any) => ({
+            number: ref.number,
+            title: ref.title || ref.rawText || '',
+            doi: ref.doi,
+          })),
+          signals: verificationResults.flatMap((r) =>
+            r.signals.map((s) => ({
+              type: s.type,
+              severity: s.severity,
+              title: s.title,
+            })),
+          ),
+        };
+
+        aiResult = await this.aiService.analyzePaper(paperId, aiInput);
+      }
+
+      // Recalculate priority after AI (may add methodology signals)
+      const finalPriority = await this.reviewPriorityService.calculateAndPersist(paperId);
+
       // Update status to completed
       await this.prisma.paper.update({
         where: { id: paperId },
@@ -83,14 +136,15 @@ export class PapersService {
       });
 
       this.logger.log(
-        `Analysis completed for paper ${paperId}. Priority: ${reviewPriority}`,
+        `Analysis completed for paper ${paperId}. Priority: ${finalPriority}`,
       );
 
       return {
         paperId,
         status: 'COMPLETED',
-        reviewPriority,
+        reviewPriority: finalPriority,
         verificationsCount: verificationResults.length,
+        aiAnalysis: aiResult,
       };
     } catch (error) {
       this.logger.error(`Analysis failed for paper ${paperId}`, error);

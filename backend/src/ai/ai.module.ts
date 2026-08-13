@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
+import { AiService } from './ai.service';
+import { OpenAIProvider } from './providers/openai.provider';
 
 @Module({
-  // Implementation in Phase 8
+  providers: [AiService, OpenAIProvider],
+  exports: [AiService],
 })
 export class AiModule {}

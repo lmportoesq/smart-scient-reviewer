@@ -1,12 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma } from '@prisma/client';
 import {
   VerificationProvider,
   PaperVerificationInput,
   VerificationResult,
 } from './providers/verification-provider.interface';
 import { CrossrefProvider } from './providers/crossref.provider';
+import { OpenAlexProvider } from './providers/openalex.provider';
+import { PubMedProvider } from './providers/pubmed.provider';
 
 @Injectable()
 export class VerificationService {
@@ -16,13 +17,19 @@ export class VerificationService {
   constructor(
     private prisma: PrismaService,
     private crossrefProvider: CrossrefProvider,
+    private openAlexProvider: OpenAlexProvider,
+    private pubMedProvider: PubMedProvider,
   ) {
-    this.providers = [this.crossrefProvider];
+    this.providers = [
+      this.crossrefProvider,
+      this.openAlexProvider,
+      this.pubMedProvider,
+    ];
   }
 
   /**
    * Run all available verification providers for a paper.
-   * Provider failures are isolated — one failing doesn't stop others.
+   * Provider failures are isolated — one failing doesn't stop others (spec §57).
    */
   async verifyPaper(
     paperId: string,
@@ -44,11 +51,11 @@ export class VerificationService {
           error,
         );
 
-        // Create error result but don't stop other providers
+        // Create error result — do NOT stop other providers
         const errorResult: VerificationResult = {
           provider: provider.name,
           status: 'ERROR' as any,
-          metadata: { error: 'Provider unavailable' },
+          metadata: { error: `${provider.name} unavailable` },
           signals: [],
         };
         results.push(errorResult);
@@ -60,7 +67,7 @@ export class VerificationService {
   }
 
   /**
-   * Add a provider dynamically (used when OpenAlex/PubMed are implemented).
+   * Add a provider dynamically (for future extensibility).
    */
   registerProvider(provider: VerificationProvider) {
     this.providers.push(provider);

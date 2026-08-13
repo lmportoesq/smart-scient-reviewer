@@ -2,11 +2,22 @@
   "name": "smart-scient-reviewer",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "packages/*",
+    "backend"
+  ],
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
+    "dev:api": "npm run dev --workspace=backend",
+    "dev:all": "concurrently \"npm run dev\" \"npm run dev:api\"",
     "build": "next build",
+    "build:api": "npm run build --workspace=backend",
+    "build:all": "npm run build && npm run build:api",
     "start": "next start",
-    "lint": "eslint"
+    "start:api": "npm run start:prod --workspace=backend",
+    "lint": "eslint",
+    "lint:api": "npm run lint --workspace=backend",
+    "test:api": "npm run test --workspace=backend"
   },
   "dependencies": {
     "next": "16.3.0",
@@ -18,6 +29,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^9.1.2",
     "eslint": "^9",
     "eslint-config-next": "16.3.0",
     "tailwindcss": "^4",
